@@ -35,8 +35,17 @@ export const MainContent: React.FC<MainContentProps> = ({
       setCurrentView('download');
     };
 
+    const handleSkipToEdit = () => {
+      setCurrentView('edit');
+    };
+
     window.addEventListener('skipToDownload', handleSkipToDownload);
-    return () => window.removeEventListener('skipToDownload', handleSkipToDownload);
+    window.addEventListener('skipToEdit', handleSkipToEdit);
+    
+    return () => {
+      window.removeEventListener('skipToDownload', handleSkipToDownload);
+      window.removeEventListener('skipToEdit', handleSkipToEdit);
+    };
   }, [setCurrentView]);
 
   const renderView = () => {

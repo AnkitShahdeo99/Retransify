@@ -1,6 +1,5 @@
-
 import React, { useCallback } from 'react';
-import { Upload, FileText, Image, File } from 'lucide-react';
+import { Upload, FileText, Image, File, Edit, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +27,11 @@ export const UploadView: React.FC<UploadViewProps> = ({
     if (files && files.length > 0) {
       setUploadedFile(files[0]);
     }
+  };
+
+  const handleSkipToEdit = () => {
+    // Skip translate view and go directly to edit
+    window.dispatchEvent(new CustomEvent('skipToEdit'));
   };
 
   const getFileIcon = (file: File) => {
@@ -77,19 +81,39 @@ export const UploadView: React.FC<UploadViewProps> = ({
                   <h3 className="text-lg font-semibold text-slate-800">{uploadedFile.name}</h3>
                   <p className="text-slate-600">{formatFileSize(uploadedFile.size)}</p>
                 </div>
-                <div className="flex space-x-3 justify-center">
+                <div className="space-y-4">
                   <Button
                     variant="outline"
                     onClick={() => setUploadedFile(null)}
+                    className="mb-4"
                   >
                     Remove File
                   </Button>
-                  <Button
-                    onClick={onNext}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                  >
-                    Continue to Translation
-                  </Button>
+                  
+                  <div className="space-y-3">
+                    <div className="text-center">
+                      <h4 className="text-lg font-semibold text-slate-700 mb-2">What would you like to do?</h4>
+                      <p className="text-slate-600 text-sm mb-4">Choose whether to translate the document or edit it directly</p>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Button
+                        onClick={onNext}
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 flex items-center space-x-2 px-6 py-3"
+                      >
+                        <Languages className="w-4 h-4" />
+                        <span>Translate Document</span>
+                      </Button>
+                      <Button
+                        onClick={handleSkipToEdit}
+                        variant="outline"
+                        className="flex items-center space-x-2 px-6 py-3"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Edit Document</span>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
