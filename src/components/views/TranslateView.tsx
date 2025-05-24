@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Languages, ArrowRight, Loader2 } from 'lucide-react';
+import { Languages, ArrowRight, Loader2, Edit, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,6 +65,11 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
       setTranslatedContent(mockTranslated);
       setIsTranslating(false);
     }, 3000);
+  };
+
+  const handleSkipToDownload = () => {
+    // Skip edit view and go directly to download
+    window.dispatchEvent(new CustomEvent('skipToDownload'));
   };
 
   return (
@@ -157,13 +161,28 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
       )}
 
       {translatedContent && (
-        <div className="mt-6 flex justify-end">
-          <Button
-            onClick={onNext}
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-          >
-            Continue to Editor
-          </Button>
+        <div className="mt-6">
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold text-slate-700 mb-2">What would you like to do next?</h3>
+            <p className="text-slate-600 text-sm">Choose whether to edit the document or download it directly</p>
+          </div>
+          <div className="flex justify-center space-x-4">
+            <Button
+              onClick={onNext}
+              variant="outline"
+              className="flex items-center space-x-2 px-6 py-3"
+            >
+              <Edit className="w-4 h-4" />
+              <span>Edit Document</span>
+            </Button>
+            <Button
+              onClick={handleSkipToDownload}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 flex items-center space-x-2 px-6 py-3"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Now</span>
+            </Button>
+          </div>
         </div>
       )}
     </div>

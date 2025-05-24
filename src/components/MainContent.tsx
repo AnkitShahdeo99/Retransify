@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ViewState } from '@/pages/Index';
 import { UploadView } from './views/UploadView';
 import { TranslateView } from './views/TranslateView';
@@ -31,6 +30,15 @@ export const MainContent: React.FC<MainContentProps> = ({
   targetLanguage,
   setTargetLanguage,
 }) => {
+  useEffect(() => {
+    const handleSkipToDownload = () => {
+      setCurrentView('download');
+    };
+
+    window.addEventListener('skipToDownload', handleSkipToDownload);
+    return () => window.removeEventListener('skipToDownload', handleSkipToDownload);
+  }, [setCurrentView]);
+
   const renderView = () => {
     switch (currentView) {
       case 'upload':
