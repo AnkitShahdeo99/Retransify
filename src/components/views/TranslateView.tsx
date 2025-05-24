@@ -28,7 +28,6 @@ const languages = [
   { code: 'ko', name: 'Korean' },
   { code: 'zh', name: 'Chinese' },
   { code: 'ar', name: 'Arabic' },
-  // Indian Languages
   { code: 'hi', name: 'Hindi (हिन्दी)' },
   { code: 'bn', name: 'Bengali (বাংলা)' },
   { code: 'te', name: 'Telugu (తెలుగు)' },
@@ -70,31 +69,38 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
 
   const handleTranslate = async () => {
     if (!uploadedFile) return;
-    
+
     setIsTranslating(true);
-    
-    // Simulate file processing and translation
-    setTimeout(() => {
-      const mockOriginal = `This is a sample document content extracted from ${uploadedFile.name}.
 
-In a real implementation, this would contain the actual extracted text from your PDF, image (via OCR), or text file. The AI translation service would then process this content and provide an accurate translation while preserving formatting and structure.
+    try {
+      const text = await uploadedFile.text();
 
-This demo shows how the interface would work with your translated content appearing here.`;
+      const response = await fetch('https://libretranslate.com/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          q: text,
+          source: sourceLanguage === 'auto' ? 'auto' : sourceLanguage,
+          target: targetLanguage,
+          format: 'text',
+        }),
+      });
 
-      const mockTranslated = `Este es un contenido de documento de muestra extraído de ${uploadedFile.name}.
+      const data = await response.json();
 
-En una implementación real, esto contendría el texto real extraído de su PDF, imagen (a través de OCR) o archivo de texto. El servicio de traducción de IA procesaría este contenido y proporcionaría una traducción precisa mientras preserva el formato y la estructura.
-
-Esta demostración muestra cómo funcionaría la interfaz con su contenido traducido apareciendo aquí.`;
-
-      setOriginalContent(mockOriginal);
-      setTranslatedContent(mockTranslated);
+      setOriginalContent(text);
+      setTranslatedContent(data.translatedText);
+    } catch (error) {
+      console.error('Translation error:', error);
+      alert('Translation failed. Please try again.');
+    } finally {
       setIsTranslating(false);
-    }, 3000);
+    }
   };
 
   const handleSkipToDownload = () => {
-    // Skip edit view and go directly to download
     window.dispatchEvent(new CustomEvent('skipToDownload'));
   };
 
@@ -102,9 +108,7 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
     <div className="h-full p-8 flex flex-col">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-slate-800 mb-2">Translate Document</h2>
-        <p className="text-slate-600">
-          Configure translation settings and preview the results.
-        </p>
+        <p className="text-slate-600">Configure translation settings and preview the results.</p>
       </div>
 
       <div className="mb-6">
@@ -124,9 +128,9 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
               </SelectContent>
             </Select>
           </div>
-          
+
           <ArrowRight className="w-6 h-6 text-slate-400 mt-6" />
-          
+
           <div className="flex-1">
             <label className="block text-sm font-medium text-slate-700 mb-2">To</label>
             <Select value={targetLanguage} onValueChange={setTargetLanguage}>
@@ -142,7 +146,7 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="mt-6">
             <Button
               onClick={handleTranslate}
