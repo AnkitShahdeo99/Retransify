@@ -27,6 +27,32 @@ const languages = [
   { code: 'ja', name: 'Japanese' },
   { code: 'ko', name: 'Korean' },
   { code: 'zh', name: 'Chinese' },
+  { code: 'ar', name: 'Arabic' },
+  // Indian Languages
+  { code: 'hi', name: 'Hindi (हिन्दी)' },
+  { code: 'bn', name: 'Bengali (বাংলা)' },
+  { code: 'te', name: 'Telugu (తెలుగు)' },
+  { code: 'mr', name: 'Marathi (मराठी)' },
+  { code: 'ta', name: 'Tamil (தமிழ்)' },
+  { code: 'ur', name: 'Urdu (اردو)' },
+  { code: 'gu', name: 'Gujarati (ગુજરાતી)' },
+  { code: 'ml', name: 'Malayalam (മലയാളം)' },
+  { code: 'kn', name: 'Kannada (ಕನ್ನಡ)' },
+  { code: 'or', name: 'Odia (ଓଡ଼ିଆ)' },
+  { code: 'pa', name: 'Punjabi (ਪੰਜਾਬੀ)' },
+  { code: 'as', name: 'Assamese (অসমীয়া)' },
+  { code: 'mai', name: 'Maithili (मैथिली)' },
+  { code: 'sa', name: 'Sanskrit (संस्कृत)' },
+  { code: 'ne', name: 'Nepali (नेपाली)' },
+  { code: 'si', name: 'Sinhala (සිංහල)' },
+  { code: 'ks', name: 'Kashmiri (کٲشُر)' },
+  { code: 'sd', name: 'Sindhi (سنڌي)' },
+  { code: 'bho', name: 'Bhojpuri (भोजपुरी)' },
+  { code: 'gom', name: 'Konkani (कोंकणी)' },
+  { code: 'mni', name: 'Manipuri (মৈতৈলোন্)' },
+  { code: 'sat', name: 'Santali (ᱥᱟᱱᱛᱟᱲᱤ)' },
+  { code: 'doi', name: 'Dogri (डोगरी)' },
+  { code: 'bo', name: 'Tibetan (བོད་སྐད)' },
 ];
 
 export const TranslateView: React.FC<TranslateViewProps> = ({
@@ -49,8 +75,8 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
     
     // Simulate file processing and translation
     setTimeout(() => {
-      const mockOriginal = `This is a sample document content extracted from ${uploadedFile.name}. 
-      
+      const mockOriginal = `This is a sample document content extracted from ${uploadedFile.name}.
+
 In a real implementation, this would contain the actual extracted text from your PDF, image (via OCR), or text file. The AI translation service would then process this content and provide an accurate translation while preserving formatting and structure.
 
 This demo shows how the interface would work with your translated content appearing here.`;
@@ -89,7 +115,7 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-slate-200 shadow-lg z-50">
+              <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-60">
                 {languages.map((lang) => (
                   <SelectItem key={lang.code} value={lang.code}>
                     {lang.name}
@@ -107,7 +133,7 @@ Esta demostración muestra cómo funcionaría la interfaz con su contenido tradu
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-slate-200 shadow-lg z-50">
+              <SelectContent className="bg-white border border-slate-200 shadow-lg z-50 max-h-60">
                 {languages.filter(lang => lang.code !== 'auto').map((lang) => (
                   <SelectItem key={lang.code} value={lang.code}>
                     {lang.name}
