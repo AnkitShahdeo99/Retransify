@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Languages, ArrowRight, Loader2, Edit, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,15 +67,19 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
 }) => {
   const [isTranslating, setIsTranslating] = useState(false);
   const [originalContent, setOriginalContent] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleTranslate = async () => {
     if (!uploadedFile) return;
 
     setIsTranslating(true);
+    setError(null);
 
     try {
       const text = await uploadedFile.text();
+      setOriginalContent(text);
 
+      // Use LibreTranslate API
       const response = await fetch('https://libretranslate.com/translate', {
         method: 'POST',
         headers: {
@@ -88,13 +93,21 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Translation failed: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
 
-      setOriginalContent(text);
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setTranslatedContent(data.translatedText);
+      console.log('Translation successful:', data.translatedText);
     } catch (error) {
       console.error('Translation error:', error);
-      alert('Translation failed. Please try again.');
+      setError(error instanceof Error ? error.message : 'Translation failed. Please try again.');
     } finally {
       setIsTranslating(false);
     }
@@ -163,6 +176,12 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
       {(originalContent || translatedContent) && (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
