@@ -107,40 +107,103 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
     }
   };
 
-  // Simulate translation for demo purposes
+  // Simulate translation for demo purposes with readable output
   const simulateTranslation = async (text: string, sourceLang: string, targetLang: string): Promise<string> => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const targetLangName = getLanguageName(targetLang);
     
-    // Create a realistic demo translation
-    if (text.toLowerCase().includes('hello')) {
-      const greetings: { [key: string]: string } = {
-        'hi': 'नमस्ते',
-        'es': 'Hola',
-        'fr': 'Bonjour',
-        'de': 'Hallo',
-        'ja': 'こんにちは',
-        'zh': '你好',
-        'ar': 'مرحبا',
-        'bn': 'হ্যালো',
-        'te': 'హలో',
-        'mr': 'हॅलो',
-        'ta': 'வணக்கம்',
-        'ur': 'ہیلو',
-        'gu': 'હેલો',
-        'ml': 'ഹലോ',
-        'kn': 'ಹಲೋ',
-        'or': 'ହେଲୋ',
-        'pa': 'ਹੈਲੋ',
-      };
-      
-      const greeting = greetings[targetLang] || `Hello (in ${targetLangName})`;
-      return text.replace(/hello/gi, greeting);
+    // Create readable sample translations for common phrases
+    const translations: { [key: string]: { [key: string]: string } } = {
+      'en': {
+        'hello': 'Hello',
+        'welcome': 'Welcome',
+        'thank you': 'Thank you',
+        'good morning': 'Good morning',
+        'how are you': 'How are you?',
+        'goodbye': 'Goodbye'
+      },
+      'es': {
+        'hello': 'Hola',
+        'welcome': 'Bienvenido',
+        'thank you': 'Gracias',
+        'good morning': 'Buenos días',
+        'how are you': '¿Cómo estás?',
+        'goodbye': 'Adiós'
+      },
+      'fr': {
+        'hello': 'Bonjour',
+        'welcome': 'Bienvenue',
+        'thank you': 'Merci',
+        'good morning': 'Bonjour',
+        'how are you': 'Comment allez-vous?',
+        'goodbye': 'Au revoir'
+      },
+      'de': {
+        'hello': 'Hallo',
+        'welcome': 'Willkommen',
+        'thank you': 'Danke',
+        'good morning': 'Guten Morgen',
+        'how are you': 'Wie geht es Ihnen?',
+        'goodbye': 'Auf Wiedersehen'
+      },
+      'hi': {
+        'hello': 'नमस्ते',
+        'welcome': 'स्वागत है',
+        'thank you': 'धन्यवाद',
+        'good morning': 'सुप्रभात',
+        'how are you': 'आप कैसे हैं?',
+        'goodbye': 'अलविदा'
+      },
+      'ja': {
+        'hello': 'こんにちは',
+        'welcome': 'いらっしゃいませ',
+        'thank you': 'ありがとう',
+        'good morning': 'おはよう',
+        'how are you': 'お元気ですか？',
+        'goodbye': 'さようなら'
+      },
+      'zh': {
+        'hello': '你好',
+        'welcome': '欢迎',
+        'thank you': '谢谢',
+        'good morning': '早上好',
+        'how are you': '你好吗？',
+        'goodbye': '再见'
+      }
+    };
+
+    let translatedText = text.toLowerCase();
+    
+    // Apply translations if available for the target language
+    if (translations[targetLang]) {
+      const langTranslations = translations[targetLang];
+      Object.keys(langTranslations).forEach(key => {
+        const regex = new RegExp(key, 'gi');
+        translatedText = translatedText.replace(regex, langTranslations[key]);
+      });
     }
     
-    return `[Translated to ${targetLangName}]\n\n${text}\n\n[This is a demo translation. In a production environment, this would be translated using a real translation service.]`;
+    // If no specific translations were applied, create a meaningful demo message
+    if (translatedText === text.toLowerCase()) {
+      return `[Document translated to ${targetLangName}]
+
+This is a demonstration of the translation feature. Your original text:
+
+"${text}"
+
+Would be translated to ${targetLangName} using a real translation API. This demo shows how the interface works - the actual translation would replace this text with the proper ${targetLangName} translation of your document content.
+
+Key features demonstrated:
+• Real-time translation processing
+• Support for ${targetLangName} and many other languages
+• Error handling and user feedback
+• Side-by-side comparison view`;
+    }
+    
+    // Capitalize first letter and return readable translation
+    return translatedText.charAt(0).toUpperCase() + translatedText.slice(1);
   };
 
   const getLanguageName = (code: string): string => {
