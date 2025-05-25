@@ -70,28 +70,114 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const extractTextFromFile = async (file: File): Promise<string> => {
+    const fileType = file.type.toLowerCase();
+    const fileName = file.name.toLowerCase();
+
+    try {
+      // Handle text files
+      if (fileType.includes('text') || fileName.endsWith('.txt')) {
+        return await file.text();
+      }
+      
+      // Handle images - return placeholder text for demo
+      if (fileType.includes('image') || fileName.match(/\.(jpg|jpeg|png|gif|bmp)$/)) {
+        return `This is a sample text extracted from the image file "${file.name}". 
+
+In a real application, this would use OCR (Optical Character Recognition) to extract text from images. 
+
+For this demo, imagine this text was extracted from your image and can now be translated to any language.
+
+Hello world! Welcome to our translation service. Thank you for using our application.`;
+      }
+
+      // Handle PDF files - return placeholder text for demo
+      if (fileType.includes('pdf') || fileName.endsWith('.pdf')) {
+        return `This is sample content extracted from the PDF file "${file.name}".
+
+In a real application, this would use a PDF parsing library to extract text content from PDF documents.
+
+Sample document content:
+- Introduction to document translation
+- Welcome message: Hello and welcome to our service
+- Thank you for choosing our translation platform
+- We support multiple languages and file formats
+- Good morning! Have a great day using our app
+- Goodbye and see you again soon
+
+This demo shows how PDF content would be processed and made ready for translation.`;
+      }
+
+      // Handle Word documents - return placeholder text for demo
+      if (fileType.includes('officedocument') || fileName.endsWith('.docx')) {
+        return `This is sample content extracted from the Word document "${file.name}".
+
+Document Title: Sample Document for Translation
+
+Content:
+Hello everyone! Welcome to our document translation service. 
+
+This is a demonstration of how Word documents would be processed. In a production environment, we would use libraries to extract the actual text content from DOCX files.
+
+Key features:
+• Support for multiple file formats
+• Professional translation quality  
+• Thank you for your trust in our service
+• Good morning to all our users worldwide
+• Have a wonderful experience
+
+Best regards,
+Translation Team
+
+Goodbye for now!`;
+      }
+
+      // Default fallback
+      return `Unsupported file type: ${fileType}. 
+
+For this demo, here's sample text that can be translated:
+
+Hello! Welcome to our translation service. Thank you for uploading your file. We support many languages including English, Spanish, French, German, Hindi, and many more.
+
+Good morning! How are you today? We hope you have a great experience using our translation tool.
+
+Goodbye and thank you for using our service!`;
+
+    } catch (error) {
+      console.error('Error extracting text from file:', error);
+      throw new Error(`Failed to extract text from ${file.name}. Please try with a different file.`);
+    }
+  };
+
   const handleTranslate = async () => {
-    if (!uploadedFile) return;
+    if (!uploadedFile) {
+      setError('No file uploaded');
+      return;
+    }
 
     setIsTranslating(true);
     setError(null);
 
     try {
-      const text = await uploadedFile.text();
-      setOriginalContent(text);
-
-      // For demo purposes, since LibreTranslate API has CORS and API key issues,
-      // we'll create a simulated translation that shows the functionality
-      const simulatedTranslation = await simulateTranslation(text, sourceLanguage, targetLanguage);
+      console.log('Starting translation for file:', uploadedFile.name, 'Type:', uploadedFile.type);
       
-      setTranslatedContent(simulatedTranslation);
+      // Extract text from the file
+      const extractedText = await extractTextFromFile(uploadedFile);
+      console.log('Extracted text:', extractedText.substring(0, 200) + '...');
+      
+      setOriginalContent(extractedText);
+
+      // Simulate translation with the extracted text
+      const translatedText = await simulateTranslation(extractedText, sourceLanguage, targetLanguage);
+      
+      setTranslatedContent(translatedText);
       
       toast({
         title: "Translation Complete",
         description: `Document translated from ${getLanguageName(sourceLanguage)} to ${getLanguageName(targetLanguage)}`,
       });
       
-      console.log('Translation successful:', simulatedTranslation);
+      console.log('Translation successful');
     } catch (error) {
       console.error('Translation error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Translation failed. Please try again.';
@@ -116,21 +202,16 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
     
     // Create readable sample translations for common phrases
     const translations: { [key: string]: { [key: string]: string } } = {
-      'en': {
-        'hello': 'Hello',
-        'welcome': 'Welcome',
-        'thank you': 'Thank you',
-        'good morning': 'Good morning',
-        'how are you': 'How are you?',
-        'goodbye': 'Goodbye'
-      },
       'es': {
         'hello': 'Hola',
         'welcome': 'Bienvenido',
         'thank you': 'Gracias',
         'good morning': 'Buenos días',
         'how are you': '¿Cómo estás?',
-        'goodbye': 'Adiós'
+        'goodbye': 'Adiós',
+        'hello everyone': 'Hola a todos',
+        'have a great day': 'Que tengas un buen día',
+        'best regards': 'Saludos cordiales'
       },
       'fr': {
         'hello': 'Bonjour',
@@ -138,7 +219,10 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         'thank you': 'Merci',
         'good morning': 'Bonjour',
         'how are you': 'Comment allez-vous?',
-        'goodbye': 'Au revoir'
+        'goodbye': 'Au revoir',
+        'hello everyone': 'Bonjour tout le monde',
+        'have a great day': 'Passez une excellente journée',
+        'best regards': 'Cordialement'
       },
       'de': {
         'hello': 'Hallo',
@@ -146,7 +230,10 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         'thank you': 'Danke',
         'good morning': 'Guten Morgen',
         'how are you': 'Wie geht es Ihnen?',
-        'goodbye': 'Auf Wiedersehen'
+        'goodbye': 'Auf Wiedersehen',
+        'hello everyone': 'Hallo alle zusammen',
+        'have a great day': 'Haben Sie einen schönen Tag',
+        'best regards': 'Mit freundlichen Grüßen'
       },
       'hi': {
         'hello': 'नमस्ते',
@@ -154,7 +241,10 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         'thank you': 'धन्यवाद',
         'good morning': 'सुप्रभात',
         'how are you': 'आप कैसे हैं?',
-        'goodbye': 'अलविदा'
+        'goodbye': 'अलविदा',
+        'hello everyone': 'सभी को नमस्ते',
+        'have a great day': 'आपका दिन शुभ हो',
+        'best regards': 'सादर'
       },
       'ja': {
         'hello': 'こんにちは',
@@ -162,7 +252,10 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         'thank you': 'ありがとう',
         'good morning': 'おはよう',
         'how are you': 'お元気ですか？',
-        'goodbye': 'さようなら'
+        'goodbye': 'さようなら',
+        'hello everyone': 'みなさん、こんにちは',
+        'have a great day': '良い一日を',
+        'best regards': 'よろしくお願いします'
       },
       'zh': {
         'hello': '你好',
@@ -170,11 +263,14 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         'thank you': '谢谢',
         'good morning': '早上好',
         'how are you': '你好吗？',
-        'goodbye': '再见'
+        'goodbye': '再见',
+        'hello everyone': '大家好',
+        'have a great day': '祝你有美好的一天',
+        'best regards': '此致敬礼'
       }
     };
 
-    let translatedText = text.toLowerCase();
+    let translatedText = text;
     
     // Apply translations if available for the target language
     if (translations[targetLang]) {
@@ -183,27 +279,16 @@ export const TranslateView: React.FC<TranslateViewProps> = ({
         const regex = new RegExp(key, 'gi');
         translatedText = translatedText.replace(regex, langTranslations[key]);
       });
+    } else {
+      // For languages not in our translation map, add a realistic demo prefix
+      translatedText = `[Translated to ${targetLangName}]
+
+${text}
+
+Note: This is a demonstration showing how your document would appear after translation to ${targetLangName}. In a production environment, the entire text would be properly translated using professional translation services.`;
     }
     
-    // If no specific translations were applied, create a meaningful demo message
-    if (translatedText === text.toLowerCase()) {
-      return `[Document translated to ${targetLangName}]
-
-This is a demonstration of the translation feature. Your original text:
-
-"${text}"
-
-Would be translated to ${targetLangName} using a real translation API. This demo shows how the interface works - the actual translation would replace this text with the proper ${targetLangName} translation of your document content.
-
-Key features demonstrated:
-• Real-time translation processing
-• Support for ${targetLangName} and many other languages
-• Error handling and user feedback
-• Side-by-side comparison view`;
-    }
-    
-    // Capitalize first letter and return readable translation
-    return translatedText.charAt(0).toUpperCase() + translatedText.slice(1);
+    return translatedText;
   };
 
   const getLanguageName = (code: string): string => {
